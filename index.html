@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Uğur İnan - Kumanda</title>
-    <meta name="description" content="LG Cinema 3D Smart TV için web tabanlı kumanda uygulaması">
+    <meta name="description" content="LG 47LA860V Smart TV Kumanda">
     <meta name="theme-color" content="#667eea">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,92 +21,147 @@
                 </h1>
                 <div class="connection-status" id="connectionStatus">
                     <span class="status-dot"></span>
-                    <span class="status-text">Bağlantı Bekleniyor</span>
+                    <span class="status-text">IP Adresi Girin</span>
                 </div>
             </div>
         </header>
 
         <main class="main-content">
-    </div>
+            <!-- Settings Panel -->
+            <div class="settings-panel" id="settingsPanel">
+                <div class="settings-content">
+                    <h2>TV Ayarları</h2>
+                    <button class="close-btn" id="closeSettings">✕</button>
 
-    <!-- Navigation -->
-    <div class="nav-section">
-        <div class="nav-pad">
-            <button class="btn-nav" data-key="UP">▲</button>
-            <button class="btn-nav" data-key="LEFT">◀</button>
-            <button class="btn-nav btn-ok" data-key="ENTER">OK</button>
-            <button class="btn-nav" data-key="RIGHT">▶</button>
-            <button class="btn-nav" data-key="DOWN">▼</button>
+                    <div class="input-group">
+                        <label for="tvIp">TV IP Adresi</label>
+                        <input type="text" id="tvIp" placeholder="192.168.1.35" value="">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="tvPort">Port</label>
+                        <input type="number" id="tvPort" placeholder="8080" value="8080">
+                    </div>
+
+                    <button class="btn-primary" id="saveSettings">Kaydet</button>
+
+                    <div class="settings-info">
+                        <p><strong>LG 47LA860V (426a620s-za)</strong></p>
+                        <p>• Smartify tarzı direkt kontrol</p>
+                        <p>• Pairing gerekmez</p>
+                        <p>• Port: 8080</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote Control -->
+            <div class="remote-control">
+                <!-- Power -->
+                <div class="power-section">
+                    <button class="btn-power" data-key="POWER">⏻</button>
+                </div>
+
+                <!-- Navigation -->
+                <div class="nav-section">
+                    <div class="nav-pad">
+                        <button class="btn-nav" data-key="UP">▲</button>
+                        <button class="btn-nav" data-key="LEFT">◀</button>
+                        <button class="btn-nav btn-ok" data-key="ENTER">OK</button>
+                        <button class="btn-nav" data-key="RIGHT">▶</button>
+                        <button class="btn-nav" data-key="DOWN">▼</button>
+                    </div>
+                    <div class="nav-controls">
+                        <button class="btn-control" data-key="BACK">
+                            <span>↶</span>
+                            <span class="btn-label">Geri</span>
+                        </button>
+                        <button class="btn-control" data-key="HOME">
+                            <span>🏠</span>
+                            <span class="btn-label">Ana Sayfa</span>
+                        </button>
+                        <button class="btn-control" data-key="EXIT">
+                            <span>✕</span>
+                            <span class="btn-label">Çıkış</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Volume & Channel -->
+                <div class="control-section">
+                    <div class="control-group">
+                        <div class="control-label">Ses</div>
+                        <button class="btn-volume" data-key="VOLUMEUP">🔊 +</button>
+                        <button class="btn-volume" data-key="VOLUMEDOWN">🔉 −</button>
+                        <button class="btn-mute" data-key="MUTE">🔇 Sessiz</button>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">Kanal</div>
+                        <button class="btn-channel" data-key="CHANNELUP">📺 ▲</button>
+                        <button class="btn-channel" data-key="CHANNELDOWN">📺 ▼</button>
+                    </div>
+                </div>
+
+                <!-- Numbers -->
+                <div class="number-section">
+                    <div class="number-pad">
+                        <button class="btn-number" data-key="1">1</button>
+                        <button class="btn-number" data-key="2">2</button>
+                        <button class="btn-number" data-key="3">3</button>
+                        <button class="btn-number" data-key="4">4</button>
+                        <button class="btn-number" data-key="5">5</button>
+                        <button class="btn-number" data-key="6">6</button>
+                        <button class="btn-number" data-key="7">7</button>
+                        <button class="btn-number" data-key="8">8</button>
+                        <button class="btn-number" data-key="9">9</button>
+                        <button class="btn-number" data-key="0">0</button>
+                    </div>
+                </div>
+
+                <!-- Media -->
+                <div class="media-section">
+                    <div class="media-controls">
+                        <button class="btn-media" data-key="PLAY">▶</button>
+                        <button class="btn-media" data-key="PAUSE">⏸</button>
+                        <button class="btn-media" data-key="STOP">⏹</button>
+                        <button class="btn-media" data-key="REWIND">⏪</button>
+                        <button class="btn-media" data-key="FASTFORWARD">⏩</button>
+                    </div>
+                </div>
+
+                <!-- Special -->
+                <div class="special-section">
+                    <button class="btn-special" data-key="INPUT">
+                        <span>📥</span>
+                        <span>Input</span>
+                    </button>
+                    <button class="btn-special" data-key="MENU">
+                        <span>☰</span>
+                        <span>Menu</span>
+                    </button>
+                    <button class="btn-special" data-key="3D">
+                        <span>🕶️</span>
+                        <span>3D</span>
+                    </button>
+                    <button class="btn-special" data-key="SMART">
+                        <span>🌐</span>
+                        <span>Smart</span>
+                    </button>
+                </div>
+
+                <!-- Settings Button -->
+                <div class="footer-section">
+                    <button class="btn-settings" id="settingsBtn">
+                        <span>⚙️</span>
+                        <span>Ayarlar</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast -->
+        <div class="toast" id="toast">
+            <span id="toastMessage"></span>
         </div>
-        <div class="nav-controls">
-            <button class="btn-control" data-key="BACK"><span>↶</span><span class="btn-label">Geri</span></button>
-            <button class="btn-control" data-key="HOME"><span>🏠</span><span class="btn-label">Ana
-                    Sayfa</span></button>
-            <button class="btn-control" data-key="EXIT"><span>✕</span><span class="btn-label">Çıkış</span></button>
-        </div>
-    </div>
-
-    <!-- Volume & Channel -->
-    <div class="control-section">
-        <div class="control-group">
-            <div class="control-label">Ses</div>
-            <button class="btn-volume" data-key="VOLUMEUP">🔊 +</button>
-            <button class="btn-volume" data-key="VOLUMEDOWN">� −</button>
-            <button class="btn-mute" data-key="MUTE">🔇 Sessiz</button>
-        </div>
-        <div class="control-group">
-            <div class="control-label">Kanal</div>
-            <button class="btn-channel" data-key="CHANNELUP">📺 ▲</button>
-            <button class="btn-channel" data-key="CHANNELDOWN">📺 ▼</button>
-        </div>
-    </div>
-
-    <!-- Numbers -->
-    <div class="number-section">
-        <div class="number-pad">
-            <button class="btn-number" data-key="1">1</button>
-            <button class="btn-number" data-key="2">2</button>
-            <button class="btn-number" data-key="3">3</button>
-            <button class="btn-number" data-key="4">4</button>
-            <button class="btn-number" data-key="5">5</button>
-            <button class="btn-number" data-key="6">6</button>
-            <button class="btn-number" data-key="7">7</button>
-            <button class="btn-number" data-key="8">8</button>
-            <button class="btn-number" data-key="9">9</button>
-            <button class="btn-number" data-key="0">0</button>
-        </div>
-    </div>
-
-    <!-- Media -->
-    <div class="media-section">
-        <div class="media-controls">
-            <button class="btn-media" data-key="PLAY">▶</button>
-            <button class="btn-media" data-key="PAUSE">⏸</button>
-            <button class="btn-media" data-key="STOP">⏹</button>
-            <button class="btn-media" data-key="REWIND">⏪</button>
-            <button class="btn-media" data-key="FASTFORWARD">⏩</button>
-        </div>
-    </div>
-
-    <!-- Special -->
-    <div class="special-section">
-        <button class="btn-special" data-key="INPUT"><span>📥</span><span>Input</span></button>
-        <button class="btn-special" data-key="MENU"><span>☰</span><span>Menu</span></button>
-        <button class="btn-special" data-key="3D"><span>🕶️</span><span>3D</span></button>
-        <button class="btn-special" data-key="SMART"><span>🌐</span><span>Smart</span></button>
-    </div>
-
-    <!-- Settings Button -->
-    <div class="footer-section">
-        <button class="btn-settings" id="settingsBtn"><span>⚙️</span><span>Ayarlar</span></button>
-    </div>
-    </div>
-    </main>
-
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <span id="toastMessage"></span>
-    </div>
     </div>
 
     <script src="app.js"></script>

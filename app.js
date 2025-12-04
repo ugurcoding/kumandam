@@ -1,7 +1,7 @@
 // ============================================
-// LG Smart TV Remote Control Application
-// NetCast 4.0 - HTTP UDAP Protocol
-// For LG 47LA860V and similar models
+// LG Smart TV Remote Control - Smartify Style
+// NetCast 4.0 - Direct Command (No Pairing)
+// For LG 47LA860V (426a620s-za)
 // ============================================
 
 class LGTVRemote {
@@ -9,7 +9,6 @@ class LGTVRemote {
         this.tvIP = localStorage.getItem('tvIP') || '';
         this.tvPort = localStorage.getItem('tvPort') || '8080';
         this.connected = false;
-        this.sessionId = null;
 
         this.init();
     }
@@ -19,27 +18,25 @@ class LGTVRemote {
         this.loadSettings();
         this.updateConnectionStatus();
 
-        // Auto-connect if settings exist
         if (this.tvIP) {
-            this.connect();
+            this.connected = true;
+            this.updateConnectionStatus();
         }
     }
 
     setupEventListeners() {
-        // Settings panel
-        document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsBtn')?.addEventListener('click', () => {
             this.openSettings();
         });
 
-        document.getElementById('closeSettings').addEventListener('click', () => {
+        document.getElementById('closeSettings')?.addEventListener('click', () => {
             this.closeSettings();
         });
 
-        document.getElementById('saveSettings').addEventListener('click', () => {
+        document.getElementById('saveSettings')?.addEventListener('click', () => {
             this.saveSettings();
         });
 
-        // All control buttons
         const buttons = document.querySelectorAll('[data-key]');
         buttons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -49,172 +46,101 @@ class LGTVRemote {
             });
         });
 
-        // Close settings on backdrop click
-        document.getElementById('settingsPanel').addEventListener('click', (e) => {
+        document.getElementById('settingsPanel')?.addEventListener('click', (e) => {
             if (e.target.id === 'settingsPanel') {
                 this.closeSettings();
             }
         });
 
-        // Keyboard support
         document.addEventListener('keydown', (e) => {
             this.handleKeyboard(e);
         });
     }
 
     loadSettings() {
-        document.getElementById('tvIp').value = this.tvIP;
-        document.getElementById('tvPort').value = this.tvPort;
+        const ipInput = document.getElementById('tvIp');
+        const portInput = document.getElementById('tvPort');
+        if (ipInput) ipInput.value = this.tvIP;
+        if (portInput) portInput.value = this.tvPort;
     }
 
     saveSettings() {
-        this.tvIP = document.getElementById('tvIp').value.trim();
-        this.tvPort = document.getElementById('tvPort').value.trim() || '8080';
+        this.tvIP = document.getElementById('tvIp')?.value.trim() || '';
+        this.tvPort = document.getElementById('tvPort')?.value.trim() || '8080';
 
         if (!this.tvIP) {
             this.showToast('Lütfen TV IP adresini girin', 'error');
             return;
         }
 
-        // Validate IP format
-        const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-        if (!ipPattern.test(this.tvIP)) {
-            this.showToast('Geçersiz IP adresi formatı', 'error');
-            return;
-        }
-
         localStorage.setItem('tvIP', this.tvIP);
         localStorage.setItem('tvPort', this.tvPort);
 
+        this.connected = true;
+        this.updateConnectionStatus();
         this.closeSettings();
-        this.connect();
+        this.showToast('Ayarlar kaydedildi', 'success');
     }
 
     openSettings() {
-        document.getElementById('settingsPanel').classList.add('active');
+        document.getElementById('settingsPanel')?.classList.add('active');
     }
 
     closeSettings() {
-        document.getElementById('settingsPanel').classList.remove('active');
-    }
-
-    async connect() {
-        if (!this.tvIP) {
-            this.showToast('Lütfen önce TV ayarlarını yapın', 'error');
-            this.openSettings();
-            return;
-        }
-
-        try {
-            this.showToast('TV\'ye bağlanılıyor...', 'info');
-
-            // Test connection with a simple pairing request
-            const pairingData = {
-                type: "pairing",
-                name: "Uğur İnan - Kumanda",
-                port: this.tvPort
-            };
-
-            const response = await this.sendUDAPRequest('pairing', pairingData);
-
-            if (response) {
-                this.connected = true;
-                this.updateConnectionStatus();
-                this.showToast('TV\'ye bağlandı! TV ekranında kodu onaylayın.', 'success');
-            } else {
-                this.connected = true; // Allow commands anyway
-                this.updateConnectionStatus();
-                this.showToast('Bağlantı kuruldu. Butonları test edin.', 'info');
-            }
-        } catch (error) {
-            console.error('Connection error:', error);
-            this.connected = true; // Allow testing anyway
-            this.updateConnectionStatus();
-            this.showToast('Komutlar gönderilmeye hazır', 'info');
-        }
-    }
-
-    async sendUDAPRequest(endpoint, data) {
-        const url = `http://${this.tvIP}:${this.tvPort}/udap/api/${endpoint}`;
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/atom+xml',
-                },
-                body: this.buildUDAPXML(data),
-                mode: 'no-cors'
-            });
-
-            console.log('UDAP request sent:', endpoint);
-            return true;
-        } catch (error) {
-            console.error('UDAP request failed:', error);
-            return false;
-        }
-    }
-
-    buildUDAPXML(data) {
-        // Build UDAP XML format for NetCast
-        return `<?xml version="1.0" encoding="utf-8"?>
-<envelope>
-    <api type="pairing">
-        <name>${data.name || 'Web Remote'}</name>
-        <value>${data.port || '8080'}</value>
-        <port>${data.port || '8080'}</port>
-    </api>
-</envelope>`;
+        document.getElementById('settingsPanel')?.classList.remove('active');
     }
 
     async sendCommand(key) {
         if (!this.tvIP) {
-            this.showToast('Lütfen önce TV\'ye bağlanın', 'error');
+            this.showToast('Lütfen önce TV IP adresini girin', 'error');
             this.openSettings();
             return;
         }
 
         try {
-            // Send key command via UDAP
+            const keyCode = this.mapKeyToCode(key);
+
+            // Smartify-style direct command (no pairing)
+            const url = `http://${this.tvIP}:${this.tvPort}/udap/api/command`;
+
             const commandXML = `<?xml version="1.0" encoding="utf-8"?>
 <envelope>
     <api type="command">
         <name>HandleKeyInput</name>
-        <value>${this.mapKeyToUDAP(key)}</value>
+        <value>${keyCode}</value>
     </api>
 </envelope>`;
 
-            const url = `http://${this.tvIP}:${this.tvPort}/udap/api/command`;
-
-            await fetch(url, {
+            // Send command
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/atom+xml',
                 },
                 body: commandXML,
                 mode: 'no-cors'
-            });
+            }).catch(() => { });
 
-            console.log('Command sent:', this.getKeyLabel(key));
+            console.log(`Command sent: ${this.getKeyLabel(key)} (${keyCode})`);
 
         } catch (error) {
             console.error('Send command error:', error);
         }
     }
 
-    mapKeyToUDAP(key) {
-        // Map WebOS keys to UDAP key codes
+    mapKeyToCode(key) {
+        // LG NetCast key codes (same as Smartify uses)
         const keyMap = {
             'POWER': '1',
-            'UP': '2',
-            'DOWN': '3',
-            'LEFT': '4',
-            'RIGHT': '5',
-            'ENTER': '6',
-            'OK': '6',
-            'BACK': '8',
+            'UP': '12',
+            'DOWN': '13',
+            'LEFT': '14',
+            'RIGHT': '15',
+            'ENTER': '20',
+            'OK': '20',
+            'BACK': '23',
             'HOME': '21',
-            'EXIT': '91',
+            'EXIT': '412',
             'VOLUMEUP': '24',
             'VOLUMEDOWN': '25',
             'MUTE': '26',
@@ -229,11 +155,19 @@ class LGTVRemote {
             'MENU': '67',
             '3D': '220',
             'SMART': '105',
-            '0': '16', '1': '17', '2': '18', '3': '19', '4': '20',
-            '5': '21', '6': '22', '7': '23', '8': '24', '9': '25'
+            '0': '16',
+            '1': '17',
+            '2': '18',
+            '3': '19',
+            '4': '20',
+            '5': '21',
+            '6': '22',
+            '7': '23',
+            '8': '24',
+            '9': '25'
         };
 
-        return keyMap[key] || '6';
+        return keyMap[key] || '20';
     }
 
     getKeyLabel(key) {
@@ -261,16 +195,13 @@ class LGTVRemote {
             'INPUT': 'Giriş',
             'MENU': 'Menü',
             '3D': '3D',
-            'SMART': 'Smart',
-            '0': '0', '1': '1', '2': '2', '3': '3', '4': '4',
-            '5': '5', '6': '6', '7': '7', '8': '8', '9': '9'
+            'SMART': 'Smart'
         };
         return labels[key] || key;
     }
 
     handleKeyboard(e) {
-        // Don't handle keyboard if settings panel is open
-        if (document.getElementById('settingsPanel').classList.contains('active')) {
+        if (document.getElementById('settingsPanel')?.classList.contains('active')) {
             return;
         }
 
@@ -303,7 +234,6 @@ class LGTVRemote {
             }
         }
 
-        // Number keys
         if (e.key >= '0' && e.key <= '9') {
             e.preventDefault();
             this.sendCommand(e.key);
@@ -323,18 +253,14 @@ class LGTVRemote {
 
     updateConnectionStatus() {
         const statusElement = document.getElementById('connectionStatus');
-        const statusText = statusElement.querySelector('.status-text');
+        const statusText = statusElement?.querySelector('.status-text');
 
-        if (this.connected) {
+        if (this.connected && statusElement && statusText) {
             statusElement.classList.add('connected');
-            statusText.textContent = `Bağlı: ${this.tvIP}`;
-        } else {
+            statusText.textContent = `Hazır: ${this.tvIP}`;
+        } else if (statusElement && statusText) {
             statusElement.classList.remove('connected');
-            if (this.tvIP) {
-                statusText.textContent = 'Bağlantı Kesildi';
-            } else {
-                statusText.textContent = 'Bağlantı Bekleniyor';
-            }
+            statusText.textContent = 'IP Adresi Girin';
         }
     }
 
@@ -342,22 +268,24 @@ class LGTVRemote {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
 
-        toastMessage.textContent = message;
-        toast.className = `toast ${type}`;
-        toast.classList.add('show');
+        if (toast && toastMessage) {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
 
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
     }
 }
 
-// Initialize Application
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     const remote = new LGTVRemote();
     window.lgRemote = remote;
 
-    console.log('LG 47LA860V Remote Control initialized');
-    console.log('NetCast 4.0 - HTTP UDAP Protocol');
-    console.log('Keyboard shortcuts enabled');
+    console.log('LG 47LA860V Remote - Smartify Style');
+    console.log('TV Name: 426a620s-za');
+    console.log('Direct command mode (no pairing)');
 });
