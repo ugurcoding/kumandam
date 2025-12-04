@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Uğur İnan - Kumanda</title>
+    <meta name="description" content="LG Cinema 3D Smart TV için web tabanlı kumanda uygulaması">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LG Remote">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="tv-icon">📺</span>
+                    Uğur İnan - Kumanda
+                </h1>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <button class="btn-power" id="powerBtn" data-key="POWER">
+                        <span class="power-icon">⏻</span>
+                    </button>
+                </div>
+
+                <!-- Navigation Pad -->
+                <div class="nav-section">
+                    <div class="nav-pad">
+                        <button class="btn-nav btn-up" id="upBtn" data-key="UP">▲</button>
+                        <button class="btn-nav btn-left" id="leftBtn" data-key="LEFT">◀</button>
+                        <button class="btn-nav btn-ok" id="okBtn" data-key="OK">OK</button>
+                        <button class="btn-nav btn-right" id="rightBtn" data-key="RIGHT">▶</button>
+                        <button class="btn-nav btn-down" id="downBtn" data-key="DOWN">▼</button>
+                    </div>
+                    <div class="nav-controls">
+                        <button class="btn-control" id="backBtn" data-key="BACK">
+                            <span>↶</span>
+                            <span class="btn-label">Geri</span>
+                        </button>
+                        <button class="btn-control" id="homeBtn" data-key="HOME">
+                            <span>🏠</span>
+                            <span class="btn-label">Ana Sayfa</span>
+                        </button>
+                        <button class="btn-control" id="exitBtn" data-key="EXIT">
+                            <span>✕</span>
+                            <span class="btn-label">Çıkış</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Volume & Channel Controls -->
+                <div class="control-section">
+                    <div class="control-group">
+                        <div class="control-label">Ses</div>
+                        <button class="btn-volume" id="volUpBtn" data-key="VOLUMEUP">
+                            <span>🔊</span>
+                        </button>
+                        <button class="btn-channel" id="chDownBtn" data-key="CHANNELDOWN">
+                            <span>📺</span>
+                            <span>▼</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Number Pad -->
+                <div class="number-section">
+                    <div class="number-pad">
+                        <button class="btn-number" data-key="1">1</button>
+                        <button class="btn-number" data-key="2">2</button>
+                        <button class="btn-number" data-key="3">3</button>
+                        <button class="btn-number" data-key="4">4</button>
+                        <button class="btn-number" data-key="5">5</button>
+                        <button class="btn-number" data-key="6">6</button>
+                        <button class="btn-number" data-key="7">7</button>
+                        <button class="btn-number" data-key="8">8</button>
+                        <button class="btn-number" data-key="9">9</button>
+                        <button class="btn-number" data-key="0">0</button>
+                    </div>
+                </div>
+
+                <!-- Media Controls -->
+                <div class="media-section">
+                    <div class="media-controls">
+                        <button class="btn-media" id="playBtn" data-key="PLAY">
+                            <span>▶</span>
+                        </button>
+                        <button class="btn-media" id="pauseBtn" data-key="PAUSE">
+                            <span>⏸</span>
+                        </button>
+                        <button class="btn-media" id="stopBtn" data-key="STOP">
+                            <span>⏹</span>
+                        </button>
+                        <button class="btn-media" id="rewindBtn" data-key="REWIND">
+                            <span>⏪</span>
+                        </button>
+                        <button class="btn-media" id="forwardBtn" data-key="FORWARD">
+                            <span>⏩</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Special Functions -->
+                <div class="special-section">
+                    <button class="btn-special" id="inputBtn" data-key="INPUT">
+                        <span>📥</span>
+                        <span>Input</span>
+                    </button>
+                    <button class="btn-special" id="menuBtn" data-key="MENU">
+                        <span>☰</span>
+                        <span>Menu</span>
+                    </button>
+                    <button class="btn-special" id="3dBtn" data-key="3D">
+                        <span>🕶️</span>
+                        <span>3D</span>
+                    </button>
+                    <button class="btn-special" id="smartBtn" data-key="SMART">
+                        <span>🌐</span>
+                        <span>Smart</span>
+                    </button>
+                </div>
+
+                <!-- Settings Button -->
+                <div class="footer-section">
+                    <button class="btn-settings" id="settingsBtn">
+                        <span>⚙️</span>
+                        <span>Ayarlar</span>
+                    </button>
+                </div>
+            </div>
+            </main>
+
+            <!-- Toast Notification -->
+            <div class="toast" id="toast">
+                <span id="toastMessage"></span>
+            </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

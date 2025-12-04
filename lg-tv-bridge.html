@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LG TV Bridge Server</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .log {
+            background: #0f0f23;
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+
+        .error {
+            border-left-color: #ff0000;
+            color: #ff6b6b;
+        }
+
+        .success {
+            border-left-color: #51cf66;
+            color: #51cf66;
+        }
+
+        .info {
+            border-left-color: #4facfe;
+            color: #4facfe;
+        }
+
+        h1 {
+            color: #00ff00;
+            text-align: center;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        .config {
+            background: #0f0f23;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        input {
+            background: #1a1a2e;
+            border: 1px solid #667eea;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 4px;
+            width: 200px;
+            font-family: inherit;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🌉 LG TV Bridge Server</h1>
+
+    <div class="status">
+        <span id="status">⏸️ Hazır</span>
+    </div>
+
+    <div class="config">
+        <h3>TV Yapılandırması</h3>
+        <label>TV IP: <input type="text" id="tvIP" value="192.168.1.35" placeholder="192.168.1.35"></label><br><br>
+        <button onclick="startBridge()">🚀 Bridge'i Başlat</button>
+        <button onclick="testConnection()">🔍 Bağlantıyı Test Et</button>
+        <button onclick="clearLog()">🗑️ Günlüğü Temizle</button>
+    </div>
+
+    <div class="log" id="log">
+        <div class="log-entry info">Bridge server hazır. TV IP adresini girin ve başlatın.</div>
+    </div>
+
+    <script>
+        let tvIP = '192.168.1.35';
+        let bridgeActive = false;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Günlük temizlendi', 'info');
+        }
+
+        async function testConnection() {
+            tvIP = document.getElementById('tvIP').value;
+            log(`TV bağlantısı test ediliyor: ${tvIP}`, 'info');
+
+            // Test different ports
+            const ports = [8080, 3000, 3001, 8001];
+
+            for (const port of ports) {
+                try {
+                    log(`Port ${port} deneniyor...`, 'info');
+                    const response = await fetch(`http://${tvIP}:${port}/`, {
+                        method: 'GET',
+                        mode: 'no-cors'
+                    });
+                    log(`✓ Port ${port} yanıt verdi`, 'success');
+                } catch (error) {
+                    log(`✗ Port ${port} yanıt vermedi: ${error.message}`, 'error');
+                }
+            }
+
+            log('Bağlantı testi tamamlandı', 'info');
+        }
+
+        function startBridge() {
+            tvIP = document.getElementById('tvIP').value;
+            bridgeActive = true;
+            document.getElementById('status').textContent = '🟢 Aktif';
+            log(`Bridge başlatıldı - TV IP: ${tvIP}`, 'success');
+            log('Kumanda uygulamasından gelen komutlar burada görünecek', 'info');
+
+            // Listen for messages from the remote control
+            window.addEventListener('message', handleRemoteCommand);
+        }
+
+        function handleRemoteCommand(event) {
+            if (!bridgeActive) return;
+
+            const { command, key } = event.data;
+            log(`Komut alındı: ${key}`, 'info');
+
+            // Send command to TV
+            sendToTV(command, key);
+        }
+
+        async function sendToTV(command, key) {
+            try {
+                log(`TV'ye gönderiliyor: ${key}`, 'info');
+
+                // UDAP protocol for older LG TVs
+                const udapCommand = {
+                    envelope: {
+                        api: 'command',
+                        type: 'keyboard',
+                        name: 'HandleKeyInput',
+                        value: key
+                    }
+                };
+
+                const response = await fetch(`http://${tvIP}:8080/udap/api/command`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(udapCommand),
+                    mode: 'no-cors'
+                });
+
+                log(`✓ Komut gönderildi: ${key}`, 'success');
+            } catch (error) {
+                log(`✗ Komut gönderilemedi: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-load saved IP
+        window.addEventListener('load', () => {
+            const savedIP = localStorage.getItem('tvIP');
+            if (savedIP) {
+                document.getElementById('tvIP').value = savedIP;
+                tvIP = savedIP;
+            }
+        });
+
+        // Save IP on change
+        document.getElementById('tvIP').addEventListener('change', (e) => {
+            localStorage.setItem('tvIP', e.target.value);
+        });
+    </script>
+</body>
+
+</html>
